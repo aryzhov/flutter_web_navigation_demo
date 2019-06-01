@@ -5,39 +5,10 @@ const title = "Flutter Web Navigation With Tabs";
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+class MyApp extends StatelessWidget {
 
   final navigatorKey = GlobalKey<NavigatorState>(debugLabel: "Navigator");
   final navigatorPage = PageTracker();
-  TabController tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: pageNames.length, vsync: this);
-    tabController.addListener(() {
-      if(!tabController.indexIsChanging) {
-        final page = tabController.index;
-        final nav = navigatorKey.currentState;
-        if(navigatorPage.page != page) {
-          final pageName = page == 0 ? '': '/${pageNames[page]}';
-          print("Push replacement: $pageName");
-          nav.pushReplacementNamed(pageName);
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    tabController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +32,14 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
       settings: RouteSettings(name: settings.name, isInitialRoute: true),
       builder: (context) {
         if(page != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => _goToPage(page));
-          return MyHomePage(tabController);
+          return MyHomePage(page: page, onTabChanged: (page) {
+            final nav = navigatorKey.currentState;
+            if(navigatorPage.page != page) {
+              final pageName = page == 0 ? '': '/${pageNames[page]}';
+              print("Push replacement: $pageName");
+              nav.pushReplacementNamed(pageName);
+            }
+          });
         } else {
           return PageNotFound(settings.name);
         }
@@ -70,18 +47,39 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     );
   }
 
-  _goToPage(int page) {
-    tabController.index = page;
-    print("Set tab index: $page");
-  }
-
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
 
-  final TabController tabController;
-  
-  MyHomePage(this.tabController);
+  final Function(int page) onTabChanged;
+  final int page;
+
+  MyHomePage({@required this.page, @required this.onTabChanged,});
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+
+  TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: pageNames.length, vsync: this, initialIndex: widget.page);
+    tabController.addListener(() {
+      if(!tabController.indexIsChanging) {
+        widget.onTabChanged(tabController.index);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
