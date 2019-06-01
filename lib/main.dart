@@ -4,28 +4,14 @@ const pages = ["Home", "Products", "Services", "News", "Events", "About"];
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Navigation Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
-class MyHomePage extends StatefulWidget {
+class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  
-  TabController tabController;
+TabController tabController;
 
   @override
   void initState() {
@@ -41,27 +27,63 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Navigation Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(tabController),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+
+  final TabController tabController;
+
+  MyHomePage(this.tabController);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Hello"),
         bottom: TabBar(
-          controller: tabController, 
+          controller: widget.tabController, 
           tabs: [
             for(var p in pages)
               Tab(text: p),
           ]
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Hello, World!',
-            ),
-          ],
-        ),
+      body: TabBarView(
+        controller: widget.tabController,
+        children: [
+          for(var p in pages)
+            SomePage(p),
+        ],
       ), 
     );
   }
+}
+
+class SomePage extends StatelessWidget {
+
+  final String text;
+
+  SomePage(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(text,),
+    );
+  }
+
 }
