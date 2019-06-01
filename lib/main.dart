@@ -1,6 +1,6 @@
 import 'package:flutter_web/material.dart';
 
-const pages = ["Home", "Products", "Services", "News", "Events", "About"];
+const pageNames = ["Home", "Products", "Services", "News", "Events", "About"];
 const title = "Flutter Web Navigation With Tabs";
 
 void main() => runApp(MyApp());
@@ -19,13 +19,13 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: pages.length, vsync: this);
+    tabController = TabController(length: pageNames.length, vsync: this);
     tabController.addListener(() {
       if(!tabController.indexIsChanging) {
         final page = tabController.index;
         final nav = navigatorKey.currentState;
         if(navigatorPage.page != page) {
-          final pageName = page == 0 ? '': '/${pages[page]}';
+          final pageName = page == 0 ? '': '/${pageNames[page]}';
           print("Push replacement: $pageName");
           nav.pushReplacementNamed(pageName);
         }
@@ -58,11 +58,11 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   Route _generateRoute(RouteSettings settings) {
     final int page = getPageFromRoute(settings);
     return MaterialPageRoute(
-      settings: RouteSettings(name: settings.name, isInitialRoute: page != null),
+      settings: RouteSettings(name: settings.name, isInitialRoute: true),
       builder: (context) {
         if(page != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => goToPage(page));
-          return MyHomePage(tabController,);
+          WidgetsBinding.instance.addPostFrameCallback((_) => _goToPage(page));
+          return MyHomePage(tabController);
         } else {
           return PageNotFound(settings.name);
         }
@@ -70,56 +70,48 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     );
   }
 
-  goToPage(int page) {
-    if(tabController.index != page)  {
-      print("Set tab index: $page");
-      tabController.index = page;
-    }
+  _goToPage(int page) {
+    tabController.index = page;
+    print("Set tab index: $page");
   }
 
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
 
   final TabController tabController;
-
+  
   MyHomePage(this.tabController);
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
         bottom: TabBar(
-          controller: widget.tabController, 
+          controller: tabController, 
           tabs: [
-            for(var p in pages)
+            for(var p in pageNames)
               Tab(text: p),
           ]
         ),
       ),
       body: TabBarView(
-        controller: widget.tabController,
+        controller: tabController,
         children: [
-          for(var p in pages)
-            SomePage(p),
+          for(var p in pageNames)
+            PageStub(p),
         ],
       ), 
     );
   }
 }
 
-class SomePage extends StatelessWidget {
+class PageStub extends StatelessWidget {
 
   final String text;
 
-  SomePage(this.text);
+  PageStub(this.text);
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +125,7 @@ class SomePage extends StatelessWidget {
 int getPageFromRoute(RouteSettings rs) {
   if(rs.name == null) return null;
   final pageName = rs.name.startsWith('/') ? rs.name.substring(1): rs.name;
-  final page = pageName == '' ? 0 : pages.indexOf(pageName);
+  final page = pageName == '' ? 0 : pageNames.indexOf(pageName);
   return page >= 0 ? page: null;
 }
 
