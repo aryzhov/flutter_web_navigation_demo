@@ -1,6 +1,6 @@
 # Introduction
 
-This project is a small demo of a soluion that combines TabBar navigation with URL navigation in a Flutter Web application. It allows preserving the current tab in the URL. Since this is a typical design for websites, I made this project to demonstrate this solution as it could be used to other developers. 
+This project is a small demo of a solution that combines TabBar navigation with URL navigation in a Flutter Web application. It allows preserving the current tab in the URL. Since this is a typical design for websites, I made this project to demonstrate this solution as it could be used to other developers. 
 
 With the current design of Flutter Web, it's not a trivial task to achieve consistent behavior between a `TabBar` and a `Navigator`. I am not happy with my solution for the reasons I describe below, and I hope that the Flutter Team considers this in future versions of Flutter Web.
 
@@ -21,6 +21,10 @@ With the current design of Flutter Web, it's not a trivial task to achieve consi
 7. We add a listener to `tabController`. At the end of the tab change animation, we call `Navigator.pushReplacementNamed` with a page name that corresponds to the newly selected tab, but only if it's not already the current page, which we know from `PageTracker`. 
 
 8. We add a `PageNotFound` widget that gets rendered by `onGenerateRoute` if the URL does not correspond to one of our page names.
+
+# Running
+
+To run this project, first follow the [Getting Started](https://github.com/flutter/flutter_web) guide for Flutter Web, then run `webdev serve`.
 
 # Issues
 
