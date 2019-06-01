@@ -1,6 +1,7 @@
 import 'package:flutter_web/material.dart';
 
 const pages = ["Home", "Products", "Services", "News", "Events", "About"];
+const title = "Flutter Web Navigation With Tabs";
 
 void main() => runApp(MyApp());
 
@@ -41,7 +42,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Navigation Demo',
+      title: title,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -57,7 +58,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   Route _generateRoute(RouteSettings settings) {
     final int page = getPageFromRoute(settings);
     return MaterialPageRoute(
-      settings: RouteSettings(name: settings.name, isInitialRoute: true),
+      settings: RouteSettings(name: settings.name, isInitialRoute: page != null),
       builder: (context) {
         if(page != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) => goToPage(page));
@@ -94,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Flutter Web TabBar + Navigator Solution Demo"),
+        title: Text(title),
         bottom: TabBar(
           controller: widget.tabController, 
           tabs: [
@@ -181,6 +182,7 @@ class PageNotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text(title),),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
